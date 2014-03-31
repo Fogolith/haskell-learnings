@@ -1,0 +1,10 @@
+Name:               mypretty
+Version:            0.1
+
+-- Comment
+
+Synopsis: My pretty printing library, with JSON support
+Description:
+    A simple pretty printing library
+Author: Justin Oblak
+Maintainer: noone@noone.com
