@@ -17,11 +17,9 @@ localMaxima xs = snd $ foldl (\acc x -> checkMaxima x xs acc) (0, []) xs
                     | n > 0             = (n + 1, if (y > ys!!(n-1)) && (y > ys!!(n+1)) then y:cur else cur)
                     | otherwise         = (n + 1, cur)
 
-
--- start from the bottom and prepend
 -- histogram :: [Integer] -> String
 histogram :: [Integer] -> String
-histogram xs = foldl (\acc a -> getString a ++ acc) "\n==========\n0123456789\n" [1..maximum vals]
+histogram xs = tail $ foldl (\acc a -> getString a ++ acc) "\n==========\n0123456789\n" [1..maximum vals]
   where vals = map (\x -> fromLookup (M.lookup x kvs)) [0..9] 
         kvs = foldl (\ac y -> insertWith (+) y 1 ac) M.empty xs
         fromLookup (Just z) = z
