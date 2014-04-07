@@ -25,12 +25,13 @@ map' :: (a -> b) -> [a] -> [b]
 map' f = foldr (\x acc -> f x : acc) []
 
 -- implement foldl using foldr
-myfoldl' :: (a -> b -> a) -> a -> [b] -> a
-myfoldl' = error "todo"
+myfoldl :: (a -> b -> a) -> a -> [b] -> a
+myfoldl f empty list = foldr (\acc x -> f x acc) empty (reverse list)
 
 cartProd :: [a] -> [b] -> [(a, b)]
 cartProd xs ys = [(x,y) | x <- xs, y <- ys]
 
 -- Sieve of Sundaram algorithm (generate all prime numbers up to 2n+2)
 sieves :: Integer -> [Integer]
-sieves = error "todo"
+sieves n = map (\x -> x * 2 + 1) $ filter (`notElem` exclude) [1..n]
+	where exclude = map (\(i,j) -> i + j + 2*i*j) $ cartProd [1..n] [1..n]
