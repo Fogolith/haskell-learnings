@@ -1,9 +1,12 @@
 -- http://www.seas.upenn.edu/~cis194/hw/06-laziness.pdf
 fib :: Integer -> Integer
-fib = error "todo"
+fib n
+	| n == 0    = 0
+	| n == 1    = 1
+	| otherwise = fib (n-1)
 
 fibs1 :: [Integer]
-fibs1 = error "todo"
+fibs1 = [fib x | x <- [0..]]
 
 fibs2 :: [Integer]
 fibs2 = error "todo"
