@@ -1,8 +1,8 @@
-{-# LANGUAGE TypeSynonymInstances #-}
+{-# LANGUAGE FlexibleInstances #-}
 -- http://www.seas.upenn.edu/~cis194/hw/05-type-classes.pdf
 import ExprT (ExprT(..))
 import Parser (parseExp)
-import StackVM
+import qualified StackVM as VM
 
 newtype MinMax = MinMax Integer deriving (Eq, Show)
 newtype Mod7 = Mod7 Integer deriving (Eq, Show)
@@ -37,31 +37,13 @@ instance Expr Mod7 where
 	add (Mod7 a) (Mod7 b) = lit (a + b)
 	mul (Mod7 a) (Mod7 b) = lit (a * b)
 
+instance Expr VM.Program where
+	add a b = a ++ b ++ [VM.Add]
+	mul a b = a ++ b ++ [VM.Mul]
+	lit i = [VM.PushI i]
 
-{-
-Simply create an instance of the Expr type class for Program, so that
-arithmetic expressions can be interpreted as compiled programs. For
-any arithmetic expression exp :: Expr a => a it should be the case
-that
-
-stackVM exp == Right [IVal exp]
-
-then , put together the pieces you have to create a function
-, put together the pieces you have to create a function -}
-
-compile :: String -> Maybe Program
-compile = error "todo"
-
-testExp :: Expr a => Maybe a
-testExp = parseExp lit add mul "(3 * -4) + 5"
-
-testInteger = testExp :: Maybe Integer
-testBool = testExp :: Maybe Bool
-testMM = testExp :: Maybe MinMax
-testSat = testExp :: Maybe Mod7
-
-reify :: ExprT -> ExprT
-reify = id
+compile :: String -> Maybe VM.Program
+compile s = parseExp lit add mul s
 
 eval :: ExprT -> Integer
 eval (Lit x) = x
