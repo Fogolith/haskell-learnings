@@ -11,10 +11,11 @@ fibs1 = [fib x | x <- [0..]]
 fibs2 :: [Integer]
 fibs2 = 0 : 1 : zipWith (+) fibs2 (tail fibs2)
 
-{-
-
 -- Deﬁne a data type of polymorphic streams, Stream
-data Stream = Stream a
+-- Stream MUST be infinite, and have only a "cons" constructo
+data Stream = Cons a (Stream a) deriving (Eq)
+
+{-
 
 -- works by showing only some preﬁx of a stream (say, the ﬁrst 20 elements)
 instance Show a => Show (Stream a) where
@@ -47,7 +48,7 @@ nats = error "todo"
 -- corresponds to the ruler function 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0, 4, . . .
 -- where the nth element in the stream (assuming the ﬁrst element
 -- corresponds to n = 1) is the largest power of 2 which evenly
--- divides n. 
+-- divides n.
 ruler :: Stream Interger
 ruler = error "todo"
 
