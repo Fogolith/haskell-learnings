@@ -1,0 +1,1 @@
+-- http://www.seas.upenn.edu/~cis194/hw/07-folds-monoids.pdf
