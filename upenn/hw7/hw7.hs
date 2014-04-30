@@ -2,6 +2,7 @@ module JoinList where
 
 import Data.Monoid
 import Sized
+import Scrabble
 
 data JoinList m a = Empty
 				  | Single m a
@@ -49,12 +50,16 @@ takeJ x (Append m a b)
 
 
 data Score = Int
+
+score :: Char -> Score
+score = error "todo"
+
+scoreString :: String -> Score
+scoreString = error "todo"
+
 {-
 
-	Mr. Dickens’s publishing company has changed their
-	minds. Instead of paying him by the word, they have decided to pay
-	him according to the scoring metric used by the immensely popular
-	game of ScrabbleTM. You must therefore update your editor implementation 
+	You must therefore update your editor implementation 
 	to count Scrabble scores rather than counting words.
 
 	Hence, the second annotation you decide to implement is one
