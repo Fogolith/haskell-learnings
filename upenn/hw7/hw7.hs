@@ -1,9 +1,11 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving, FlexibleInstances #-}
+{-# LANGUAGE GeneralizedNewtypeDeriving, FlexibleInstances, TypeSynonymInstances #-}
 module JoinList where
 
 import Data.Monoid
 import Data.Char (toLower)
 import Sized
+import Buffer
+import Editor
 
 data JoinList m a = Empty
 				  | Single m a
@@ -49,8 +51,10 @@ takeJ x (Append m a b)
 	| otherwise     = a +++ (takeJ (x - leftsize) b)
 	where leftsize = getSize . size . tag $ a
 
-
 newtype Score = Score Int deriving (Eq, Ord, Show, Num)
+
+getScore :: Score -> Int
+getScore (Score x) = x
 
 instance Monoid Score where
     mempty = 0
@@ -73,45 +77,21 @@ scoreString [x] = score x
 scoreString (x:xs) = score x `mappend` scoreString xs
 
 scoreLine :: String -> JoinList Score String
+scoreLine x = Single (scoreString x) x
 
-{-
-	To test that it's working, add the line import Scrabble to JoinList
-	and write the following function to test out JoinLists annotated with scores:
+instance Buffer (JoinList (Score, Size) String) where
+	toString Empty = ""
+	toString (Single m s) = s
+	toString (Append m l r) = toString l ++ toString r
+	fromString x = Single ((scoreString x), Size 1) x
+	line n b = indexJ n b
+ 	replaceLine n _ b | indexJ n b == Nothing = b
+	replaceLine n l b = takeJ (n-1) b +++ (fromString l) +++ dropJ n b
+	numLines Empty = 0
+	numLines (Single _ _) = 1
+	numLines (Append (_, s) _ _) = getSize s
+	value Empty = 0
+	value (Single (v, _) _) = getScore v
+	value (Append (v, _) _ _) = getScore v
 
-	scoreLine :: String -> JoinList Score String
-
-		Example:
-
-	*JoinList> scoreLine "yay " +++ scoreLine "haskell!"
-
-	Append (Score 23)
-		(Single (Score 9) "yay ")
-		(Single (Score 14) "haskell!")
-
-	Exercise 4
-
-	Finally, combine these two kinds of annotations. A pair
-	of monoids is itself a monoid:
-
-	instance (Monoid a, Monoid b) => Monoid (a,b) where
-		mempty = (mempty, mempty)
-		mappend (a1,b1) (a2,b2) = (mappend a1 a2, mappend b1 b2)
-
-	This means that join-lists can track more than one type of annotation at once,
-	in parallel, simply using a pair type
-
-	Since we want to track size and score, you should provide a Buffer instance for
-	the type:
-
-		JoinList (Score, Size) String
-
-	Note: enable FlexibleInstances and TypeSynonymInstances
-
-	Finally, make a main function to run the editor interface using
-	your join-list backend in place of the slow String backend (see
-	StringBufEditor.hs for an example of how to do this). You should
-	create an initial buffer of type JoinList (Score, Size) String and
-	pass it as an argument to runEditor editor. Verify that the editor
-	demonstration described in the section “Editors and Buffers” does
-	not exhibit delays when showing the prompt.
--}
+main = runEditor editor $ Append (Score 26,Size 2) (Single (Score 8,Size 1) "Hello,") (Single (Score 18,Size 1) "I am Justin.")
