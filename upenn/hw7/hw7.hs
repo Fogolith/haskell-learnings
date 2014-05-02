@@ -1,6 +1,8 @@
+{-# LANGUAGE GeneralizedNewtypeDeriving, FlexibleInstances #-}
 module JoinList where
 
 import Data.Monoid
+import Data.Char (toLower)
 import Sized
 
 data JoinList m a = Empty
@@ -34,7 +36,7 @@ dropJ _ Empty 	     = Empty
 dropJ i a | i <= 0   = a
 dropJ _ (Single m a) = Empty
 dropJ x (Append m a b)
-	| x < leftsize = (dropJ x a) +++ b	  
+	| x < leftsize = (dropJ x a) +++ b
 	| otherwise = dropJ (x - leftsize) b
 	where leftsize = getSize . size . tag $ a
 
@@ -48,28 +50,31 @@ takeJ x (Append m a b)
 	where leftsize = getSize . size . tag $ a
 
 
-data Score = Int
+newtype Score = Score Int deriving (Eq, Ord, Show, Num)
+
+instance Monoid Score where
+    mempty = 0
+    mappend = (+)
+
+score :: Char -> Score
+score c
+  | toLower c `elem` "aeiourstln" = Score 1
+  | toLower c `elem` "dg" = Score 2
+  | toLower c `elem` "bcmp" = Score 3
+  | toLower c `elem` "fhvwy" = Score 4
+  | toLower c `elem` "k" =  Score 5
+  | toLower c `elem` "jx" = Score 8
+  | toLower c `elem` "qz" = Score 10
+  | otherwise             = Score 0
+
+scoreString :: String -> Score
+scoreString [] = Score 0
+scoreString [x] = score x
+scoreString (x:xs) = score x `mappend` scoreString xs
+
+scoreLine :: String -> JoinList Score String
+
 {-
-
-	Mr. Dickens’s publishing company has changed their
-	minds. Instead of paying him by the word, they have decided to pay
-	him according to the scoring metric used by the immensely popular
-	game of ScrabbleTM. You must therefore update your editor implementation 
-	to count Scrabble scores rather than counting words.
-
-	Hence, the second annotation you decide to implement is one
-	to cache the ScrabbleTM score for every line in a buffer. Create a
-	Scrabble module that deﬁnes a Score type, a Monoid instance for
-	Score, and the following functions:
-
-	score :: Char -> Score
-	scoreString :: String -> Score
-
-	The score function should implement the tile scoring values as
-	shown at http://www.thepixiepit.co.uk/scrabble/rules.html; any
-	characters not mentioned (punctuation, spaces, etc.) should be given
-	zero points.
-
 	To test that it's working, add the line import Scrabble to JoinList
 	and write the following function to test out JoinLists annotated with scores:
 
@@ -83,7 +88,7 @@ data Score = Int
 		(Single (Score 9) "yay ")
 		(Single (Score 14) "haskell!")
 
-	Exercise 4 
+	Exercise 4
 
 	Finally, combine these two kinds of annotations. A pair
 	of monoids is itself a monoid:
@@ -99,7 +104,7 @@ data Score = Int
 	the type:
 
 		JoinList (Score, Size) String
-	
+
 	Note: enable FlexibleInstances and TypeSynonymInstances
 
 	Finally, make a main function to run the editor interface using
