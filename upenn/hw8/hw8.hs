@@ -9,19 +9,23 @@ import Data.Tree
 -- adds an Employee to the GuestList and add their fun score without 
 -- doing any kind of checks.
 glCons :: Employee -> GuestList -> GuestList
-glCons = error "todo"
+glCons e@(Emp n f) (GL a gf) = GL (e:a) (f + gf)
 
 -- GL [Employee] Fun
 instance Monoid GuestList where
 	mempty = GL [] 0
-	mappend = error "todo"
+	mappend (GL e _) gl = foldr (glCons) gl e
 
 -- takes two GuestLists and returns whichever one of them is more fun
 moreFun :: GuestList -> GuestList -> GuestList
-moreFun = error "todo"
+moreFun a b = case (compare a b) of
+                GT -> a
+                _  -> b
 
 -- implment:
--- treeFold :: ... -> Tree a -> b
+treeFold :: (Monoid a) => (a -> b) -> Tree a -> b
+treeFold = error "todo"
+
 -- for
 {-
 	data Tree a = Node {
