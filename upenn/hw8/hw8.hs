@@ -21,26 +21,20 @@ treeFold :: (a -> b -> b) -> b -> Tree a -> b
 treeFold f e (Node r [])  = f r e
 treeFold f e (Node r s) = f r (foldr (flip $ treeFold f) e s)
 
-
-combineGLs :: Employee -> [GuestList] -> GuestList
-combineGLs boss lists = getMaxList $ foldr (\x acc -> (glCons boss x):acc) [] lists
-		where getMaxList lists = foldr findMax (GL [] 0) lists;
-			  findMax y@(GL l1 f) x@(GL l2 f1) = if f < f1 then x else y
-
--- takes the "boss" of the current sub-tree and a list of the results
--- for each subtree under that "boss" each result is a pair of GLs
--- the first GuestList in the pair is the best possible guest list
--- with the boss of that subtree; the second is the best possible guest
--- list without the boss of that subtree. nextLevel should then compute
--- the overall best guest list that includes the "boss" and the overall
--- best guest list that doesn't include the "boss"
+-- FIX, WRONG:
 nextLevel :: Employee -> [(GuestList, GuestList)] -> (GuestList, GuestList)
-nextLevel boss results = error "todo"
+nextLevel boss [] = ((GL [] 0), (GL [] 0))
+nextLevel boss [x] = x
+nextLevel boss xs = foldr (\a acc -> maxTuple a acc) (GL [] 0, GL [] 0) xs 
+	where maxTuple (a, b) (c, d) = (moreFun a c, moreFun b d);
+
+maxFun' :: Tree Employee -> (GuestList, GuestList)
+maxFun' (Node e l) = nextLevel e l
 
 -- takes a company hierarchy as input and outputs a fun-maximizing
 -- guest list. can use testCompany to test
 maxFun :: Tree Employee -> GuestList
-maxFun = error "todo"
+maxFun (Node e l) = uncurry moreFun $ nextLevel e (maxFun' l)
 
 -- implemnt main :: IO () so that it read the company.txt (use read to turn
 -- it into a Tree Employee) and then prints out a formatted guest list,
