@@ -22,6 +22,8 @@ treeFold f e (Node r [])  = f r e
 treeFold f e (Node r s) = f r (foldr (flip $ treeFold f) e s)
 
 -- FIX, WRONG:
+-- have to add boss to both lists and see what has the highest score,
+-- as well as the one with the highest score without him
 nextLevel :: Employee -> [(GuestList, GuestList)] -> (GuestList, GuestList)
 nextLevel boss [] = ((GL [] 0), (GL [] 0))
 nextLevel boss [x] = x
