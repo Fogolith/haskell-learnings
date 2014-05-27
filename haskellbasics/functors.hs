@@ -37,8 +37,8 @@ Just 8
 (+) <$> Just 3 <*> Just 5
 Just 8
 
--- lift a2 is equal to this
+-- liftA2 is equal to this ?
 liftA2 (:) (Just 3) (Just 4)
 Just [3,4]
-(:) <$> (Just 3) <*> ()Just 4)
+(:) <$> (Just 3) <*> (Just 4)
 Just [3,4]
