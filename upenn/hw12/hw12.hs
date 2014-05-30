@@ -4,11 +4,13 @@
 module Risk where
 
 import Control.Monad.Random
+import Data.List
+import Control.Monad
 
 ------------------------------------------------------------
 -- Die values
 
-newtype DieValue = DV { unDV :: Int } 
+newtype DieValue = DV { unDV :: Int }
   deriving (Eq, Ord, Show, Num)
 
 first :: (a -> b) -> (a, c) -> (b, c)
@@ -28,41 +30,16 @@ type Army = Int
 
 data Battlefield = Battlefield { attackers :: Army, defenders :: Army }
 
-{-
-	The rules of attacking in Risk are as follows.
-	• There is an attacking army (containing some number of units) and
-	a defending army (containing some number of units).
-	• The attacking player may attack with up to three units at a time.
-	However, they must always leave at least one unit behind. That
-	is, if they only have three total units in their army they may only
-	attack with two, and so on.
-	• The defending player may defend with up to two units (or only
-	one if that is all they have).
-	• To determine the outcome of a single battle, the attacking and
-	defending players each roll one six-sided die for every unit they
-	have attacking or defending. So the attacking player rolls one, two,
-	or three dice, and the defending player rolls one or two dice.
-	• The attacking player sorts their dice rolls in descending order. The
-	defending player does the same.cis 194: homework 11 4
-	• The dice are then matched up in pairs, starting with the highest
-	roll of each player, then the second-highest.
-	• For each pair, if the attacking player’s roll is higher, then one of
-	the defending player’s units die. If there is a tie, or the defending
-	player’s roll is higher, then one of the attacking player’s units die.
-
-	Write battle, which simulates a single battle (as explained above) between two
-	opposing armies.
-
-	That is, it should simulate randomly rolling the
-	appropriate number of dice, interpreting the results, and updating
-	the two armies to reﬂect casualties. You may assume that each player
-	will attack or defend with the maximum number of units they are
-	allowed.
-
--}
+rollNtimes :: Int -> Rand StdGen [DieValue]
+rollNtimes n = replicateM n die
 
 battle :: Battlefield -> Rand StdGen Battlefield
-battle = error "todo"
+battle (Battlefield a d) = do
+    aRolls <- rollNtimes (min 3 $ a)
+    bRolls <- rollNtimes (min 2 $ d)
+    let zlist = zip (sort aRolls) (sort bRolls)
+    let atklen = length . filter (\(a, b) -> a > b) $ zlist
+    return $ Battlefield (a - atklen) (d + atklen - (length zlist))
 
 {-
 	Now implement invade, which simulates an entire invasion attempt, that is, repeated calls
