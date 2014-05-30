@@ -115,8 +115,8 @@ sum (x :. y) = x + sum y
 length ::
   List a
   -> Int
-length =
-  error "todo"
+length Nil = 0
+length (x :. xs) = 1 + length xs
 
 -- | Map the given function on each element of the list.
 --
@@ -130,8 +130,8 @@ map ::
   (a -> b)
   -> List a
   -> List b
-map =
-  error "todo"
+map f Nil = Nil
+map f (x :. xs) = (f x) :. map f xs
 
 -- | Return elements satisfying the given predicate.
 --
@@ -206,7 +206,7 @@ flatMap =
 
 -- | Convert a list of optional values to an optional list of values.
 --
--- * If the list contains all `Full` values, 
+-- * If the list contains all `Full` values,
 -- then return `Full` list of values.
 --
 -- * If the list contains one or more `Empty` values,
