@@ -55,7 +55,7 @@ g = return . (+ 2)
 
 -- 4
 join' :: W (W a) -> W a
-join' a = a >>= (\y -> y)
+join' a = a >>= id
 
 -- Implement a Monad instance for the list constructor, []. Follow the types!
 -- Implement a Monad instance for ((->) e).
