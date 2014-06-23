@@ -57,8 +57,18 @@ g = return . (+ 2)
 join' :: W (W a) -> W a
 join' a = a >>= id
 
--- Implement a Monad instance for the list constructor, []. Follow the types!
+{- Implement a Monad instance for the list constructor, []. Follow the types!
+
+instance Monad [] where
+	return a = [a]
+	xs >>= f = concat (map f xs)
+
 -- Implement a Monad instance for ((->) e).
+
+instance Monad ((->) e) where
+	return a = (\_ -> a)
+	a >>= f = (\e -> f (a e)) -- i think
+-}
 
 data Free f a = Var a
               | Node (f (Free f a))
@@ -67,13 +77,14 @@ data Free f a = Var a
 -- You may assume that f has a Functor instance. This is 
 -- known as the free monad built from the functor f.
 
-instance Functor (Free f) where
-	fmap = error "todo"
+instance (Functor f) => Functor (Free f) where
+	fmap f (Var a) = Var (f a)
+	fmap f (Node a) = Node (fmap (fmap f) a)
 
-instance Applicative (Free f) where
-	pure = error "todo"
-	(<*>) = error "todo"
+instance (Functor f) => Applicative (Free f) where
+	pure = Var
+	a <*> b = error "todo"
 
-instance Monad (Free f) where
+instance (Functor f) => Monad (Free f) where
 	return = error "todo"
 	(>>=) = error "todo"
