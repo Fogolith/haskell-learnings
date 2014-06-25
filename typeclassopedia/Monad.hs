@@ -105,6 +105,18 @@ Now implement join and fmap (liftM) in terms of (>>=) and return.
 	fmap :: (a -> b) -> f a -> f b 
 	fmap f a = a >>= (return . f)
 
+return a >>= k  =  k a
+m >>= return    =  m
+m >>= (\x -> k x >>= h)  =  (m >>= k) >>= h
+ 
+fmap f xs  =  xs >>= return . f  =  liftM f xs
+
+return >=> g  =  g
+g >=> return  =  g
+(g >=> h) >=> k  =  g >=> (h >=> k)
+
+(>=>) :: Monad m => (a -> m b) -> (b -> m c) -> a -> m c
+
 Given the definition g >=> h = \x -> g x >>= h, prove the equivalence 
 of the above laws and the usual monad laws.
 -}
